@@ -19,8 +19,12 @@ builder.Logging.AddConsole(options =>
     options.LogToStandardErrorThreshold = LogLevel.Trace;
 });
 
-using var httpClient = new HttpClient { BaseAddress = new Uri("https://api.weather.gov") };
-httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("weather-mcp-server", "1.0"));
-builder.Services.AddSingleton(httpClient);
+builder.Services.AddHttpClient("WeatherApi", client =>
+{
+    client.BaseAddress = new Uri("https://api.weather.gov");
+    client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("weather-mcp-server", "1.0"));
+});
+
+builder.Services.AddHttpClient("Geocoding");
 
 await builder.Build().RunAsync();

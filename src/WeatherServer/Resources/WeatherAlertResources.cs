@@ -13,9 +13,10 @@ public sealed class WeatherAlertResources
         MimeType = "text/plain")]
     [Description("Get active weather alerts for a US state. Use the 2-letter state abbreviation (e.g. CA, NY, TX).")]
     public static async Task<string> GetAlertsByState(
-        HttpClient client,
+        IHttpClientFactory httpClientFactory,
         [Description("The 2-letter US state abbreviation (e.g. CA, NY, TX).")] string state)
     {
+        using var client = httpClientFactory.CreateClient("WeatherApi");
         using var response = await client.GetAsync($"/alerts/active/area/{state}");
         response.EnsureSuccessStatusCode();
 

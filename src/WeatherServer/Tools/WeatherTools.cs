@@ -10,14 +10,15 @@ public sealed class WeatherTools
 {
     [McpServerTool, Description("Get the current weather forecast for a given city and state in the US.")]
     public static async Task<string> GetWeather(
-        HttpClient client,
+        IHttpClientFactory httpClientFactory,
         [Description("The name of the city (e.g. San Francisco).")] string city,
         [Description("The US state (e.g. California or CA).")] string state)
     {
-        // Step 1: Geocode the city and state to latitude/longitude using the weather.gov API
-        var (latitude, longitude) = await GeocodeAsync(city, state);
+        // Step 1: Geocode the city and state to latitude/longitude using the US Census Bureau API
+        var (latitude, longitude) = await GeocodeAsync(httpClientFactory, city, state);
 
         // Step 2: Get the forecast URL from the weather.gov points API
+        using var client = httpClientFactory.CreateClient("WeatherApi");
         var pointUrl = string.Create(CultureInfo.InvariantCulture, $"/points/{latitude},{longitude}");
         using var pointResponse = await client.GetAsync(pointUrl);
         pointResponse.EnsureSuccessStatusCode();
@@ -50,12 +51,12 @@ public sealed class WeatherTools
     /// <summary>
     /// Geocodes a city and state to latitude and longitude using the US Census Bureau geocoding API.
     /// </summary>
-    private static async Task<(double Latitude, double Longitude)> GeocodeAsync(string city, string state)
+    private static async Task<(double Latitude, double Longitude)> GeocodeAsync(IHttpClientFactory httpClientFactory, string city, string state)
     {
         var address = Uri.EscapeDataString($"{city}, {state}");
         var geocodeUrl = $"https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address={address}&benchmark=Public_AR_Current&format=json";
 
-        using var geocodeClient = new HttpClient();
+        using var geocodeClient = httpClientFactory.CreateClient("Geocoding");
         using var response = await geocodeClient.GetAsync(geocodeUrl);
         response.EnsureSuccessStatusCode();
 
