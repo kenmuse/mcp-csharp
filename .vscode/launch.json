@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Weather Server",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/WeatherServer/bin/Debug/net9.0/WeatherServer.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/WeatherServer",
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    }
+  ]
+}
