@@ -3,7 +3,7 @@
   "image": "mcr.microsoft.com/devcontainers/dotnet:1-9.0",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "22"
+      "version": "24"
     }
   },
   "customizations": {
@@ -17,7 +17,10 @@
       }
     }
   },
-  "postCreateCommand": "dotnet restore src/WeatherServer/WeatherServer.csproj && npm install -g @modelcontextprotocol/inspector",
+  "postCreateCommand": {
+    "dotnet" : "dotnet restore src/WeatherServer/WeatherServer.csproj",
+    "npm" : "npm install -g @modelcontextprotocol/inspector"
+  },
   "forwardPorts": [6274, 6277],
   "portsAttributes": {
     "6274": {
@@ -27,6 +30,10 @@
     "6277": {
       "label": "MCP Inspector Proxy",
       "onAutoForward": "silent"
+    },
+    "8080": {
+      "label": "MCP",
+      "onAutoForward": "notify"
     }
   }
 }
