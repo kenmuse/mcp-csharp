@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/WeatherServer/bin/Debug/net9.0/WeatherServer.dll",
+      "program": "${workspaceFolder}/src/WeatherServer/bin/Debug/net10.0/WeatherServer.dll",
       "args": [],
       "cwd": "./src/WeatherServer",
       "console": "integratedTerminal",
