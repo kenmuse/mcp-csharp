@@ -9,7 +9,6 @@
       "version": "9.0",
       "additionalDotnetVersions": "10.0"
     }
-}
   },
   "customizations": {
     "vscode": {
