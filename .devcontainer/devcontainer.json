@@ -1,13 +1,9 @@
 {
   "name": "MCP Weather Server",
-  "image": "mcr.microsoft.com/devcontainers/base:2.1.7-noble",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:1-9.0",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "24"
-    },
-    "ghcr.io/devcontainers/features/dotnet:2": {
-      "version": "9.0",
-      "additionalDotnetVersions": "10.0"
     }
   },
   "customizations": {
@@ -21,7 +17,7 @@
       }
     }
   },
-  "postCreateCommand": {
+  "updateContentCommand": {
     "dotnet" : "dotnet build src/WeatherServer/WeatherServer.csproj",
     "npm" : "npm install -g @modelcontextprotocol/inspector"
   },
@@ -35,7 +31,7 @@
       "label": "MCP Inspector Proxy",
       "onAutoForward": "silent"
     },
-    "5000": {
+    "8080": {
       "label": "MCP",
       "onAutoForward": "notify"
     }
