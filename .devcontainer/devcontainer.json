@@ -1,9 +1,13 @@
 {
   "name": "MCP Weather Server",
-  "image": "mcr.microsoft.com/devcontainers/dotnet:1-9.0",
+  "image": "mcr.microsoft.com/devcontainers/base:2.1.7-noble",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "24"
+    },
+    "ghcr.io/devcontainers/features/dotnet:2": {
+      "version": "10.0",
+      "additionalDotnetVersions": "9.0"
     }
   },
   "customizations": {
@@ -31,7 +35,7 @@
       "label": "MCP Inspector Proxy",
       "onAutoForward": "silent"
     },
-    "8080": {
+    "5000": {
       "label": "MCP",
       "onAutoForward": "notify"
     }
