@@ -3,9 +3,9 @@ using WeatherServer.Prompts;
 using WeatherServer.Resources;
 using WeatherServer.Tools;
 
-var builder = WebApplication.CreateBuilder(args);
 var PRODUCT_INFO_HEADER = new ProductInfoHeaderValue("weather-mcp-server", "1.0");
 
+var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("InspectorCors", policy =>
