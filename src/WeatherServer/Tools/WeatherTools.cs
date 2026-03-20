@@ -54,29 +54,6 @@ public sealed class WeatherTools
     private static async Task<(double Latitude, double Longitude)> GeocodeAsync(IHttpClientFactory httpClientFactory, string city, string state)
     {
         using var geocodeClient = httpClientFactory.CreateClient("Geocoding");
-        var address = Uri.EscapeDataString($"{city}, {state}");
-        var censusUrl = $"https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address={address}&benchmark=Public_AR_Current&format=json";
-
-        using var censusResponse = await geocodeClient.GetAsync(censusUrl);
-        censusResponse.EnsureSuccessStatusCode();
-
-        using var censusDocument = JsonDocument.Parse(await censusResponse.Content.ReadAsStringAsync());
-        var matches = censusDocument.RootElement
-            .GetProperty("result")
-            .GetProperty("addressMatches");
-
-        if (matches.GetArrayLength() > 0)
-        {
-            var coordinates = matches[0]
-                .GetProperty("coordinates");
-
-            var longitude = coordinates.GetProperty("x").GetDouble();
-            var latitude = coordinates.GetProperty("y").GetDouble();
-
-            return (Math.Round(latitude, 4), Math.Round(longitude, 4));
-        }
-
-        // Fallback for city/state lookups when Census returns no address matches.
         var nominatimUrl = $"https://nominatim.openstreetmap.org/search?city={Uri.EscapeDataString(city)}&state={Uri.EscapeDataString(state)}&country=USA&countrycodes=us&format=jsonv2&limit=1";
         using var nominatimResponse = await geocodeClient.GetAsync(nominatimUrl);
         nominatimResponse.EnsureSuccessStatusCode();
