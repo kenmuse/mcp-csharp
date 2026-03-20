@@ -14,10 +14,10 @@ public sealed class WeatherAlertResources
     [Description("Get active weather alerts for a US state. Use the 2-letter state abbreviation (e.g. CA, NY, TX).")]
     public static async Task<string> GetAlertsByState(
         IHttpClientFactory httpClientFactory,
-        [Description("The 2-letter US state abbreviation (e.g. CA, NY, TX).")] string state)
+        [Description("The 2-letter US state abbreviation (e.g. CA, NY, TX).")] USState state)
     {
         using var client = httpClientFactory.CreateClient("WeatherApi");
-        using var response = await client.GetAsync($"/alerts/active/area/{state}");
+        using var response = await client.GetAsync($"/alerts/active/area/{state.ToString()}");
         response.EnsureSuccessStatusCode();
 
         using var jsonDocument = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -27,7 +27,7 @@ public sealed class WeatherAlertResources
 
         if (!alerts.Any())
         {
-            return $"No active weather alerts for {state}.";
+            return $"No active weather alerts for {state.ToString()}.";
         }
 
         return string.Join("\n--\n", alerts.Select(alert =>

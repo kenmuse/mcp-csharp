@@ -12,10 +12,10 @@ public sealed class WeatherTools
     public static async Task<string> GetWeather(
         IHttpClientFactory httpClientFactory,
         [Description("The name of the city (e.g. San Francisco).")] string city,
-        [Description("The US state (e.g. California or CA).")] string state)
+        [Description("The US state (e.g. California or CA).")] USState state)
     {
         // Step 1: Geocode the city and state to latitude/longitude
-        var (latitude, longitude) = await GeocodeAsync(httpClientFactory, city, state);
+        var (latitude, longitude) = await GeocodeAsync(httpClientFactory, city, state.ToString());
 
         // Step 2: Get the forecast URL from the weather.gov points API
         using var client = httpClientFactory.CreateClient("WeatherApi");

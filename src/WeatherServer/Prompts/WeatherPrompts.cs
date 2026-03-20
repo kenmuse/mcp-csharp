@@ -10,9 +10,9 @@ public sealed class WeatherPrompts
     [McpServerPrompt(Name = "weather_briefing"), Description("Generate a weather briefing for a city and state, including current forecast and any active alerts.")]
     public static IEnumerable<ChatMessage> WeatherBriefing(
         [Description("The city name (e.g. San Francisco)")] string city,
-        [Description("The US state (e.g. California or CA)")] string state)
+        [Description("The US state (e.g. California or CA)")] USState state)
     {
-        var stateAbbreviation = state.Length == 2 ? state.ToUpperInvariant() : state;
+        var stateAbbreviation = state.ToString();
         return
         [
             new ChatMessage(ChatRole.User, $"""
