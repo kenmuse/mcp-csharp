@@ -14,7 +14,7 @@ public sealed class WeatherTools
         [Description("The name of the city (e.g. San Francisco).")] string city,
         [Description("The US state (e.g. California or CA).")] string state)
     {
-        // Step 1: Geocode the city and state to latitude/longitude using the US Census Bureau API
+        // Step 1: Geocode the city and state to latitude/longitude
         var (latitude, longitude) = await GeocodeAsync(httpClientFactory, city, state);
 
         // Step 2: Get the forecast URL from the weather.gov points API
@@ -49,33 +49,48 @@ public sealed class WeatherTools
     }
 
     /// <summary>
-    /// Geocodes a city and state to latitude and longitude using the US Census Bureau geocoding API.
+    /// Geocodes a city and state to latitude and longitude with Census and a fallback provider.
     /// </summary>
     private static async Task<(double Latitude, double Longitude)> GeocodeAsync(IHttpClientFactory httpClientFactory, string city, string state)
     {
-        var address = Uri.EscapeDataString($"{city}, {state}");
-        var geocodeUrl = $"https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address={address}&benchmark=Public_AR_Current&format=json";
-
         using var geocodeClient = httpClientFactory.CreateClient("Geocoding");
-        using var response = await geocodeClient.GetAsync(geocodeUrl);
-        response.EnsureSuccessStatusCode();
+        var address = Uri.EscapeDataString($"{city}, {state}");
+        var censusUrl = $"https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address={address}&benchmark=Public_AR_Current&format=json";
 
-        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-        var matches = document.RootElement
+        using var censusResponse = await geocodeClient.GetAsync(censusUrl);
+        censusResponse.EnsureSuccessStatusCode();
+
+        using var censusDocument = JsonDocument.Parse(await censusResponse.Content.ReadAsStringAsync());
+        var matches = censusDocument.RootElement
             .GetProperty("result")
             .GetProperty("addressMatches");
 
-        if (matches.GetArrayLength() == 0)
+        if (matches.GetArrayLength() > 0)
         {
-            throw new InvalidOperationException($"Could not geocode '{city}, {state}'. Please check the city and state names.");
+            var coordinates = matches[0]
+                .GetProperty("coordinates");
+
+            var longitude = coordinates.GetProperty("x").GetDouble();
+            var latitude = coordinates.GetProperty("y").GetDouble();
+
+            return (Math.Round(latitude, 4), Math.Round(longitude, 4));
         }
 
-        var coordinates = matches[0]
-            .GetProperty("coordinates");
+        // Fallback for city/state lookups when Census returns no address matches.
+        var nominatimUrl = $"https://nominatim.openstreetmap.org/search?city={Uri.EscapeDataString(city)}&state={Uri.EscapeDataString(state)}&country=USA&countrycodes=us&format=jsonv2&limit=1";
+        using var nominatimResponse = await geocodeClient.GetAsync(nominatimUrl);
+        nominatimResponse.EnsureSuccessStatusCode();
 
-        var longitude = coordinates.GetProperty("x").GetDouble();
-        var latitude = coordinates.GetProperty("y").GetDouble();
+        using var nominatimDocument = JsonDocument.Parse(await nominatimResponse.Content.ReadAsStringAsync());
+        if (nominatimDocument.RootElement.ValueKind == JsonValueKind.Array && nominatimDocument.RootElement.GetArrayLength() > 0)
+        {
+            var first = nominatimDocument.RootElement[0];
+            var latitude = double.Parse(first.GetProperty("lat").GetString()!, CultureInfo.InvariantCulture);
+            var longitude = double.Parse(first.GetProperty("lon").GetString()!, CultureInfo.InvariantCulture);
 
-        return (Math.Round(latitude, 4), Math.Round(longitude, 4));
+            return (Math.Round(latitude, 4), Math.Round(longitude, 4));
+        }
+
+        throw new InvalidOperationException($"Could not geocode '{city}, {state}'. Please check the city and state names.");
     }
 }

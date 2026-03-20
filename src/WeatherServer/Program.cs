@@ -6,10 +6,24 @@ using WeatherServer.Prompts;
 using WeatherServer.Resources;
 using WeatherServer.Tools;
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("InspectorCors", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddMcpServer()
-    .WithStdioServerTransport()
+    .WithHttpTransport(options =>
+    {
+        options.Stateless = true;
+    })
     .WithTools<WeatherTools>()
     .WithResources<WeatherAlertResources>()
     .WithPrompts<WeatherPrompts>();
@@ -25,6 +39,13 @@ builder.Services.AddHttpClient("WeatherApi", client =>
     client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("weather-mcp-server", "1.0"));
 });
 
-builder.Services.AddHttpClient("Geocoding");
+builder.Services.AddHttpClient("Geocoding", client =>
+{
+    client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("weather-mcp-server", "1.0"));
+    client.DefaultRequestHeaders.AcceptLanguage.ParseAdd("en-US");
+});
 
-await builder.Build().RunAsync();
+var app = builder.Build();
+app.UseCors("InspectorCors");
+app.MapMcp();
+await app.RunAsync();

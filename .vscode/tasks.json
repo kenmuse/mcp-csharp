@@ -23,11 +23,19 @@
       "command": "npx",
       "args": [
         "@modelcontextprotocol/inspector",
-        "dotnet",
-        "run",
-        "--project",
-        "${workspaceFolder}/src/WeatherServer/WeatherServer.csproj"
+        "--transport",
+        "http",
+        "--server-url",
+        "http://127.0.0.1:8080/"
       ],
+      "options": {
+        "env": {
+          "DANGEROUSLY_OMIT_AUTH": "true",
+          "HOST": "0.0.0.0",
+          "CLIENT_PORT": "6274",
+          "SERVER_PORT": "6277"
+        }
+      },
       "problemMatcher": [],
       "group": "none",
       "presentation": {
