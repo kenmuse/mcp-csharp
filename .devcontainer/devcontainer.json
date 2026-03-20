@@ -1,6 +1,6 @@
 {
   "name": "MCP Weather Server",
-  "image": "mcr.microsoft.com/devcontainers/dotnet:1-10.0",
+  "image": "mcr.microsoft.com/devcontainers/base:2.1.7-noble",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "24"
@@ -35,7 +35,7 @@
       "label": "MCP Inspector Proxy",
       "onAutoForward": "silent"
     },
-    "8080": {
+    "5000": {
       "label": "MCP",
       "onAutoForward": "notify"
     }
